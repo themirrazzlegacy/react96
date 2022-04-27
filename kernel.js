@@ -255,3 +255,4 @@ setTimeout(function () {
   window.alert=function(e,o){prompt(o.title||"Alert",e);
   window.onerror=function(err){alert(String(err),{title:"Exception",icon:'error'})}
 }
+window.w96=react
