@@ -8,9 +8,12 @@ var react={
   util:{}
 }
 react.main=async function(){
+  try{
 document.querySelector("#convga").style.display='none';
 document.querySelector("#maingfx").style.display='block';
+  }catch(err){null}
 var $Body=document.querySelector("#maingfx");
+if(!$Body){$Body=document.createElement('div');document.body.appendChild($Body);};
 var $Desktop=document.createElement("div");
 $Desktop.className='user-desktop';
 $Body.appendChild($Desktop);
@@ -100,6 +103,7 @@ function ReactStandardWindow(params){
     windowClass:params.windowClass||""
   };
   var $id=this.id=+"wnd_"+(w96.WindowSystem._WinId);
+  w96.WindowSystem.windows.push(this);
   w96.WindowSystem._WinId++;
   if(params.center) {
     params.initialX=(window.innerWidth-params.initialWidth)/2;
@@ -149,7 +153,7 @@ ReactStandardWindow.prototype.toggleMinimize=function () {
   }
 }
 
-ReactWindow.prototype.registerWindow=function(){
+ReactStandardWindow.prototype.registerWindow=function(){
   var w$=document.createElement('div');
   w$.style.height=this.params.initialHeight+'px';
   w$.style.width=this.params.initialWidth+'px';
@@ -157,20 +161,30 @@ ReactWindow.prototype.registerWindow=function(){
   w$.id=this.id;
   var b$=document.createElement('div');
   b$.style.height="100%";
-  b$.style.width="100%;
-  b$.className="window-html";
+  b$.style.width="100%";
+  b$.className="window-html no-drag";
   b$.innerHTML=this.params.body;
   $WindowContainer.appendChild(w$);
-  $(w$).draggable({
+  $('#'+w$.id).draggable({
     cancel:'.no-drag'
   });
-  $(w$).resizable({
+  $('#'+w$.id).resizable({
     handles:'all'
   });
   this.wndObject=w$;
 }
 
 ReactStandardWindow.prototype.close=function () {
+  try{
+    for(var i=0;i<w96.WindowSystem.windows.length;i++){
+      try{
+      if(this.windows[i].id==this.id){
+        w96.WindowSystem.windows[i]=null;
+        break;
+      }
+      }catch(e){null}
+    }
+  }catch(er){null}
   this.wndObject.parentNode.removeChild(this.wndObject);
   try{
     w96.shell.Taskbar.destroyAppBar(this.id);
@@ -187,6 +201,13 @@ ReactStandardWindow.prototype.active=function () {
   } catch (e){null}
 }
 
+  ReactWindowSystem.prototype.findWindow=function(id){
+    for(var i=0;i<this.windows.length;i++){
+      try{
+      if(this.windows[i].id==id){return this.windows[i]}
+      }catch(e){null}
+    }
+  }
 
 function ReactTaskbarShell(){0;}
 
@@ -218,13 +239,13 @@ ReactTaskbarShell.prototype.destroyAppBar=function(id) {
 
 ReactTaskbarShell.prototype.activateAppBar=function(id) {
   try{
-    var tbi=document.querySelector("#"+id+"_appbar");tbi&&tbi.className="taskbar-task active";
+    var tbi=document.querySelector("#"+id+"_appbar");tbi&&(tbi.className="taskbar-task active");
   }catch(e){null}
 }
 
 ReactTaskbarShell.prototype.deactivateAppBar=function(id) {
   try{
-    var tbi=document.querySelector("#"+id+"_appbar");tbi&&tbi.className="taskbar-task";
+    var tbi=document.querySelector("#"+id+"_appbar");tbi&&(tbi.className="taskbar-task");
   }catch(e){null}
 }
 
