@@ -155,6 +155,11 @@ ReactWindow.prototype.registerWindow=function(){
   w$.style.width=this.params.initialWidth+'px';
   w$.className="window-dlg minimized";
   w$.id=this.id;
+  var b$=document.createElement('div');
+  b$.style.height="100%";
+  b$.style.width="100%;
+  b$.className="window-html";
+  b$.innerHTML=this.params.body;
   $WindowContainer.appendChild(w$);
   $(w$).draggable({
     cancel:'.no-drag'
@@ -226,4 +231,27 @@ ReactTaskbarShell.prototype.deactivateAppBar(id) {
 react.shell.Taskbar=new ReactTaskbarShell();
 react.WindowSystem = new ReactWindowSystem();
 react.StandardWindow=ReactStandardWindow;
+  
+setTimeout(function () {
+  var sw=new ReactStandardWindow({
+    title: `Welcome to React96`,
+    body: `welcome to react96 i guess<br>
+    i have no idea what i am doing<br>
+    seriously go back to win96<br>
+    <div className='react-welcome-switch'>
+    <button class='rws-rkl'>remove kernel</button><br>
+    <input class='rws-pti' value='W96FS'/><button class='rws-scp'>switch partition</button>
+    </div>`,
+    taskbar: true
+  });
+  sw.show();
+  var body=sw.wndObject;
+  body.querySelector('.rws-scp').onclick=function(){
+    localStorage.setItem('storeid',body.querySelector('.rws-scp').value);
+    location.reload();
+  }
+  body.querySelector('.rws-rkl').onclick=function(){localStorage.removeItem('kernel-image');location.reload}
+},1000);
+  window.alert=function(e,o){prompt(o.title||"Alert",e);
+  window.onerror=function(err){alert(String(err),{title:"Exception",icon:'error'})}
 }
