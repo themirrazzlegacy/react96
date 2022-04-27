@@ -210,19 +210,19 @@ ReactTaskbarShell.prototype.createWindowAppBar=function(e){
   document.querySelector(".taskbar-tasks").appendChild($AppBar);
 }
 
-ReactTaskbarShell.prototype.destroyAppBar(id) {
+ReactTaskbarShell.prototype.destroyAppBar=function(id) {
   try{
     var tbi=document.querySelector("#"+id+"_appbar");tbi&&tbi.parentNode.removeChild(tbi);
   } catch (e){null}
 }
 
-ReactTaskbarShell.prototype.activateAppBar(id) {
+ReactTaskbarShell.prototype.activateAppBar=function(id) {
   try{
     var tbi=document.querySelector("#"+id+"_appbar");tbi&&tbi.className="taskbar-task active";
   }catch(e){null}
 }
 
-ReactTaskbarShell.prototype.deactivateAppBar(id) {
+ReactTaskbarShell.prototype.deactivateAppBar=function(id) {
   try{
     var tbi=document.querySelector("#"+id+"_appbar");tbi&&tbi.className="taskbar-task";
   }catch(e){null}
@@ -252,7 +252,7 @@ setTimeout(function () {
   }
   body.querySelector('.rws-rkl').onclick=function(){localStorage.removeItem('kernel-image');location.reload}
 },1000);
-  window.alert=function(e,o){prompt(o.title||"Alert",e);
+  window.alert=function(e,o){prompt(o.title||"Alert",e);}
   window.onerror=function(err){alert(String(err),{title:"Exception",icon:'error'})}
 }
-window.w96=react
+window.w96=react;
