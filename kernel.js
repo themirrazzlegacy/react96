@@ -28,7 +28,7 @@ function __SysStyle(href){
 var d=document.createElement('link');d.rel='stylesheet';d.href=href;document.head.appendChild(d);
 }
   
-__SysStyle("ttps://raw.githubusercontent.com/themirrazz/react96/main/style.css");
+__SysStyle("https://raw.githubusercontent.com/themirrazz/react96/main/style.css");
    
   
 
