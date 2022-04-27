@@ -18,9 +18,12 @@ var $Desktop=document.createElement("div");
 $Desktop.className='user-desktop';
 $Body.appendChild($Desktop);
 var $Taskbar=document.createElement("div");
-$Taskbar.className=".user-taskbar";
+$Taskbar.className="user-taskbar";
 $Taskbar.style.zIndex="6";
 $Body.appendChild($Taskbar);
+var $Tasks=document.createElement("div");
+$Tasks.className='taskbar-tasks';
+$Taskbar.appendChild($Tasks);
 function __SysStyle(href){
 var d=document.createElement('link');d.rel='stylesheet';d.href=href;document.head.appendChild(d);
 }
@@ -164,6 +167,7 @@ ReactStandardWindow.prototype.registerWindow=function(){
   b$.style.width="100%";
   b$.className="window-html no-drag";
   b$.innerHTML=this.params.body;
+  w$.appendChild(b$);
   $WindowContainer.appendChild(w$);
   $('#'+w$.id).draggable({
     cancel:'.no-drag'
@@ -263,7 +267,7 @@ setTimeout(function () {
     <button class='rws-rkl'>remove kernel</button><br>
     <input class='rws-pti' value='W96FS'/><button class='rws-scp'>switch partition</button>
     </div>`,
-    taskbar: true
+    taskbar: false
   });
   sw.show();
   var body=sw.wndObject;
