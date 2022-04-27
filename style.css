@@ -2,7 +2,7 @@
   background-color: white;
 }
 
-.user-desktop{background-color:blue;width:100%;height:100%;position:fixed;top:0px;left:0px}
+.user-desktop{background-color:blue;width:100%;height:100%;position:fixed;z-index:4;background-position:center;box-sizing:border-box;user-select:none;-moz-user-select:none;-ms-user-select:none;-webkit-user-select:none;overflow:hidden;outline:0;}
 
 .user-taskbar{width:100%;position:fixed;bottom:0px;left:0px;height:25px;font-size:22px;background-color:grey;}
 .taskbar-task{height:25px;font-size:100%;background-color:grey;border: 1px solid black inset;}
