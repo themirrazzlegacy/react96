@@ -7,6 +7,7 @@ var react={
   evt:{},
   util:{}
 }
+var highestZIndex=10;
 react.main=async function(){
   try{
 document.querySelector("#convga").style.display='none';
@@ -14,12 +15,13 @@ document.querySelector("#maingfx").style.display='block';
   }catch(err){null}
 var $Body=document.querySelector("#maingfx");
 if(!$Body){$Body=document.createElement('div');document.body.appendChild($Body);};
-var $Desktop=document.createElement("div");
+  $Body.classList.add('mgfx-main');
+var $Desktop=document.createElement("section");
 $Desktop.className='user-desktop';
 $Body.appendChild($Desktop);
-var $Taskbar=document.createElement("div");
+var $Taskbar=document.createElement("footer");
 $Taskbar.className="user-taskbar";
-$Taskbar.style.zIndex="6";
+$Taskbar.style.zIndex="1000000000000000000000000000000000000000000000000";
 $Body.appendChild($Taskbar);
 var $Tasks=document.createElement("div");
 $Tasks.className='taskbar-tasks';
@@ -28,13 +30,37 @@ function __SysStyle(href){
 var d=document.createElement('link');d.rel='stylesheet';d.href=href;document.head.appendChild(d);
 }
   
-__SysStyle("https://raw.githubusercontent.com/themirrazz/react96/main/style.css");
+function __SysStyleRaw(href){
+var d=document.createElement('style');d.rel='stylesheet';d.innerText=href;document.head.appendChild(d);
+}
+  
+__SysStyleRaw(`.window-dlg {
+  background-color: white !important;
+}
+
+.user-desktop{background-color:blue;width:100vw;height:100vh;position:fixed;z-index:4;background-position:center;box-sizing:border-box;user-select:none;-moz-user-select:none;-ms-user-select:none;-webkit-user-select:none;overflow:hidden;outline:0;}
+
+.user-taskbar{width:100%;position:fixed;bottom:0px;left:0px;height:25px;font-size:22px;background-color:grey;}
+.taskbar-task{height:25px;font-size:100%;background-color:grey;border: 1px solid black inset;}
+.taskbar-task.active{border: 1px solid black outset;}
+.window-dlg{display:block !important;}
+.window-dlg.minimized{display:none !important}
+.window-dlg{
+border: 1px solid black !important;
+}
+
+.window-dlg .titlebar{
+background-color:blue !important;
+color: white !important;
+font-size: 16px !important;
+}
+`);
    
   
 
-var $WindowContainer=document.createElement('div');
+var $WindowContainer=/*document.createElement('div');
 $WindowContainer.className="react-window-area";
-$Body.appendChild($WindowContainer);
+$Body.appendChild($WindowContainer);*/$Desktop;
 
 function ReactWindowSystem() {
   this._WinId=0;
@@ -122,6 +148,7 @@ function ReactStandardWindow(params){
   this.shown=false;
   this.title=args.title;
   this.maximized=false;
+  this.minimized=true;
   this.maximizable=true;
   this.minimizable=true;
   this.appbarRegistered=false;
@@ -162,6 +189,32 @@ ReactStandardWindow.prototype.registerWindow=function(){
   w$.style.width=this.params.initialWidth+'px';
   w$.className="window-dlg minimized";
   w$.id=this.id;
+  var tb=document.createElement("div");
+  tb.className="titlebar";
+  var tbt=document.createElement("div");
+  tbt.className='titlebar-title';
+  tbt.innerText=this.params.title;
+  tb.appendChild(tbt);
+  var me=this;
+  var tbc=document.createElement('div');
+  tbc.className="titlebar-closebutton";
+  tbc.onclick=function () {
+    me.close();
+  };
+  tb.appendChild(tbc);
+  var tbc=document.createElement('div');
+  tbc.className="titlebar-maxbutton";
+  tbc.onclick=function () {
+    me.toggleMaximize();
+  };
+  tb.appendChild(tbc);
+  var tbc=document.createElement('div');
+  tbc.className="titlebar-minbutton";
+  tbc.onclick=function () {
+    me.toggleMinimize();
+  };
+  tb.appendChild(tbc);
+  w$.appendChild(tb);
   var b$=document.createElement('div');
   b$.style.height="100%";
   b$.style.width="100%";
@@ -198,12 +251,18 @@ ReactStandardWindow.prototype.close=function () {
 ReactStandardWindow.prototype.active=function () {
   w96.WindowSystem.deactivateAllWindows();
   this.wndObject.classList.add("active");
-  this.style.zIndex=w96.WindowSystem.highestZIndex;
-  w96.WindowSystem.highestZIndex++;
+  this.wndObject.style.zIndex=highestZIndex;
+  highestZIndex++;
   try{
     w96.shell.Taskbar.activateAppBar(this.windows[i].id);
   } catch (e){null}
 }
+  
+ ReactStandardWindow.prototype.registerAppBar=function(){
+   if(this.appbarRegistered)return;
+   this.appbarRegistered=true;
+   createWindowAppBar(this);
+ }
 
   ReactWindowSystem.prototype.findWindow=function(id){
     for(var i=0;i<this.windows.length;i++){
@@ -232,6 +291,7 @@ ReactTaskbarShell.prototype.createWindowAppBar=function(e){
   $ABTitle.className="taskbar-task-text";
   $ABTitle.id="wnd_"+$id+"_appbar_text";
   $AppBar.appendChild($ABTitle);
+  $AppBar.associatedWindow=e
   document.querySelector(".taskbar-tasks").appendChild($AppBar);
 }
 
