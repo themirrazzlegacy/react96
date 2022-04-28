@@ -61,6 +61,10 @@ background-color: #b4b4b4;
 }
 
 .inactive-tb-button{pointer-events:none;opacity:0.5;}
+
+.titlebar-maxbutton {background-image:none;background:none;border-radius:20px;}
+.titlebar-minbutton {background-color:white;background-image:none;background:none;border-radius:20px;}
+.titlebar-closebutton {background-color:white;background-image:none;background:white;border-radius:20px;}
 `);
    
   
