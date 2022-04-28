@@ -38,11 +38,12 @@ __SysStyleRaw(`.window-dlg {
   background-color: white !important;
 }
 
+
 .user-desktop{background-color:blue;width:100vw;height:100vh;position:fixed;z-index:4;background-position:center;box-sizing:border-box;user-select:none;-moz-user-select:none;-ms-user-select:none;-webkit-user-select:none;overflow:hidden;outline:0;}
 
 .user-taskbar{width:100%;position:fixed;bottom:0px;left:0px;height:25px;font-size:22px;background-color:grey;}
-.taskbar-task{height:25px;font-size:100%;background-color:grey;border: 1px solid black inset;}
-.taskbar-task.active{border: 1px solid black outset;}
+.taskbar-task{height:25px;font-size:100%;background-color:grey;border: 2px inset #bfbfbf;background:none;box-shadow:none!important;}
+.react-window-bar.active{border: 2px outset #bfbfbf !important;}
 .window-dlg{display:block !important;}
 .window-dlg.minimized{display:none !important}
 .window-dlg{
@@ -50,10 +51,16 @@ border: 1px solid black !important;
 }
 
 .window-dlg .titlebar{
-background-color:blue !important;
+background:blue;
 color: white !important;
 font-size: 16px !important;
 }
+
+.window-dlg:not(.active) .titlebar {
+background-color: #b4b4b4;
+}
+
+.inactive-tb-button{pointer-events:none;opacity:0.5;}
 `);
    
   
@@ -131,7 +138,7 @@ function ReactStandardWindow(params){
     minimizable: true,
     windowClass:params.windowClass||""
   };
-  var $id=this.id=+"wnd_"+(w96.WindowSystem._WinId);
+  var $id=this.id="wnd_"+(w96.WindowSystem._WinId);
   w96.WindowSystem.windows.push(this);
   w96.WindowSystem._WinId++;
   if(params.center) {
@@ -181,10 +188,15 @@ ReactStandardWindow.prototype.toggleMinimize=function () {
     this.wndObject.classList.add("minimized");
     w96.WindowSystem.deactivateAllWindows();
   }
+  this.minimized=!this.minimized;
 }
-
+$Desktop.onclick=function(){w96.WindowSystem.deactivateAllWindows();};
 ReactStandardWindow.prototype.registerWindow=function(){
   var w$=document.createElement('div');
+  w$.window=this
+  //var us=this;
+  w$.onmousedown=function(e){e.cancelBubble=true;try{e.stopPropagation()}catch(x){null};this.window.active()}
+  w$.onclick=function(e){e.cancelBubble=true;try{e.stopPropagation()}catch(x){null};}
   w$.style.height=this.params.initialHeight+'px';
   w$.style.width=this.params.initialWidth+'px';
   w$.className="window-dlg minimized";
@@ -197,19 +209,19 @@ ReactStandardWindow.prototype.registerWindow=function(){
   tb.appendChild(tbt);
   var me=this;
   var tbc=document.createElement('div');
-  tbc.className="titlebar-closebutton";
+  tbc.className="titlebar-closebutton no-drag";
   tbc.onclick=function () {
     me.close();
   };
   tb.appendChild(tbc);
   var tbc=document.createElement('div');
-  tbc.className="titlebar-maxbutton";
+  tbc.className="titlebar-maxbutton no-drag";
   tbc.onclick=function () {
     me.toggleMaximize();
   };
   tb.appendChild(tbc);
   var tbc=document.createElement('div');
-  tbc.className="titlebar-minbutton";
+  tbc.className="titlebar-minbutton no-drag";
   tbc.onclick=function () {
     me.toggleMinimize();
   };
@@ -229,6 +241,28 @@ ReactStandardWindow.prototype.registerWindow=function(){
     handles:'all'
   });
   this.wndObject=w$;
+  this.setControlBoxStyle(this.params.controlBoxStyle);
+}
+  
+ReactStandardWindow.prototype.setControlBoxStyle=function(cbx){
+  if(cbx=="WS_CBX_NONE"){
+    this.wndObject.querySelector(".titlebar-maxbutton").style.display="none";
+    this.wndObject.querySelector(".titlebar-minbutton").style.display="none";
+    this.wndObject.querySelector(".titlebar-closebutton").style.display="none";
+  } else if(cbx=="WS_CBX_CLOSE"){
+    this.wndObject.querySelector(".titlebar-maxbutton").style.display="none";
+    this.wndObject.querySelector(".titlebar-minbutton").style.display="none";
+    this.wndObject.querySelector(".titlebar-closebutton").style.display="";
+  } else if(cbx=="WS_CBX_MINCLOSE") {
+    this.wndObject.querySelector(".titlebar-maxbutton").className="titlebar-maxbutton inactive-tb-button";
+    this.wndObject.querySelector(".titlebar-minbutton").style.display="";
+    this.wndObject.querySelector(".titlebar-closebutton").style.display="";
+  } else {
+    this.wndObject.querySelector(".titlebar-maxbutton").style.display="";
+    this.wndObject.querySelector(".titlebar-maxbutton").className="titlebar-maxbutton"
+    this.wndObject.querySelector(".titlebar-minbutton").style.display="";
+    this.wndObject.querySelector(".titlebar-closebutton").style.display="";
+  }
 }
 
 ReactStandardWindow.prototype.close=function () {
@@ -254,14 +288,14 @@ ReactStandardWindow.prototype.active=function () {
   this.wndObject.style.zIndex=highestZIndex;
   highestZIndex++;
   try{
-    w96.shell.Taskbar.activateAppBar(this.windows[i].id);
+    w96.shell.Taskbar.activateAppBar(this.id);
   } catch (e){null}
 }
   
  ReactStandardWindow.prototype.registerAppBar=function(){
    if(this.appbarRegistered)return;
    this.appbarRegistered=true;
-   createWindowAppBar(this);
+   w96.shell.Taskbar.createWindowAppBar(this);
  }
 
   ReactWindowSystem.prototype.findWindow=function(id){
@@ -280,9 +314,9 @@ ReactTaskbarShell.prototype.createWindowAppBar=function(e){
   var args=e.params;
   var $AppBar=document.createElement("div");
   $AppBar.className="taskbar-task react-window-bar";
-  $AppBar.id="wnd_"+$id+"_appbar";
+  $AppBar.id=$id+"_appbar";
   var $ABIcon=document.createElement("img");
-  $ABIcon.className="taskbar-task-icon react-window-bar";
+  $ABIcon.className="taskbar-task-icon";
   $ABIcon.style.display='none';
   $ABIcon.id='wnd_'+$id+'_appbar_icon';
   $AppBar.appendChild($ABIcon);
@@ -291,25 +325,26 @@ ReactTaskbarShell.prototype.createWindowAppBar=function(e){
   $ABTitle.className="taskbar-task-text";
   $ABTitle.id="wnd_"+$id+"_appbar_text";
   $AppBar.appendChild($ABTitle);
-  $AppBar.associatedWindow=e
+  $AppBar.associatedWindow=e;
+  $AppBar.onclick=function(){this.associatedWindow.toggleMinimize()}
   document.querySelector(".taskbar-tasks").appendChild($AppBar);
 }
 
 ReactTaskbarShell.prototype.destroyAppBar=function(id) {
   try{
-    var tbi=document.querySelector("#"+id+"_appbar");tbi&&tbi.parentNode.removeChild(tbi);
-  } catch (e){null}
+    var tbi=document.querySelector("#"+id+"_appbar");tbi.parentNode.removeChild(tbi);
+  } catch (e){alert(e)}
 }
 
 ReactTaskbarShell.prototype.activateAppBar=function(id) {
   try{
-    var tbi=document.querySelector("#"+id+"_appbar");tbi&&(tbi.className="taskbar-task active");
+    var tbi=document.querySelector("#"+id+"_appbar");tbi.className="taskbar-task react-window-bar active";
   }catch(e){null}
 }
 
 ReactTaskbarShell.prototype.deactivateAppBar=function(id) {
   try{
-    var tbi=document.querySelector("#"+id+"_appbar");tbi&&(tbi.className="taskbar-task");
+    var tbi=document.querySelector("#"+id+"_appbar");tbi.className="taskbar-task react-window-bar inactive";
   }catch(e){null}
 }
 
@@ -327,7 +362,7 @@ setTimeout(function () {
     <button class='rws-rkl'>remove kernel</button><br>
     <input class='rws-pti' value='W96FS'/><button class='rws-scp'>switch partition</button>
     </div>`,
-    taskbar: false
+    taskbar: true
   });
   sw.show();
   var body=sw.wndObject;
