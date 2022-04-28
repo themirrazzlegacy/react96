@@ -34,9 +34,7 @@ function __SysStyleRaw(href){
 var d=document.createElement('style');d.rel='stylesheet';d.innerText=href;document.head.appendChild(d);
 }
   
-__SysStyleRaw(`.window-dlg {
-  background-color: white !important;
-}
+__SysStyleRaw(`
 
 
 .user-desktop{background-color:blue;width:100vw;height:100vh;position:fixed;z-index:4;background-position:center;box-sizing:border-box;user-select:none;-moz-user-select:none;-ms-user-select:none;-webkit-user-select:none;overflow:hidden;outline:0;}
@@ -47,24 +45,45 @@ __SysStyleRaw(`.window-dlg {
 .window-dlg{display:block !important;}
 .window-dlg.minimized{display:none !important}
 .window-dlg{
-border: 1px solid black !important;
+border: none !important;
+box-shadow: none !important;
+background: black;
+background-color: black !important;
+border-radius: 4px !important;
+color: white;
+padding: none !important;
+overflow:hidden !important;
+position: absolute !important;
+flex-direction: column !important;
 }
 
 .window-dlg .titlebar{
-background:blue;
+background:#2f2f2f;
 color: white !important;
 font-size: 16px !important;
+height: 22px;
+margin:0px;
 }
 
-.window-dlg:not(.active) .titlebar {
-background-color: #b4b4b4;
+.window-dlg .titlebar-title{
+vertical-align:middle;
+-webkit-vertical-align:middle;
+font-size:14px !important;
+}
+*{font-family:Arial,sans}
+
+
+
+.window-dlg:not(.active) .titlebar{
+opacity: 0.75;
 }
 
-.inactive-tb-button{pointer-events:none;opacity:0.5;}
+.inactive-tb-button{pointer-events:none;opacity:0.7;}
 
-.titlebar-maxbutton {background-image:none;background:none;border-radius:20px;}
-.titlebar-minbutton {background-color:white;background-image:none;background:none;border-radius:20px;}
-.titlebar-closebutton {background-color:white;background-image:none;background:white;border-radius:20px;}
+.titlebar-maxbutton {background-repeat:no-repeat !important;background-position:center !important;background-size:cover !important;background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAIAAADZF8uwAAAAAXNSR0IArs4c6QAAAK5JREFUKBWdkDEOhCAURL+4Ba2dnMDWxBtAbCm+R+AEljScyIPgCQw1lNpSmWCxG9as2bjZqX5mJi8/U3RdB3d6pJTuOkCujaZpPsySMXa2EHEcx33fl2XJPkknIaIQQmsthEDEnLxJwzBwzo0x3ntrrVKKUvrklXVdA4CUsu97Y8y6rgAQY5znWSlFCHHOvUpVVU3TtG1b/iPGaK2llIYQirZtc/Dt+HenK+8n0gEI/FVcAv9gOgAAAABJRU5ErkJggg==) !important;border-radius:20px;height:18px;width:18px;margin:0;}
+.titlebar-minbutton {background-repeat:no-repeat !important;background-position:center !important;background-size:cover !important;background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAIAAADZF8uwAAAAAXNSR0IArs4c6QAAALpJREFUKBWFkLsNhDAQRIfjApN6ZQkqIEUicD+ICgjJgHqQXAAUQAN8TCGEex90B7KQmGx23340XpqmuNOTme8YPG4J4AdprYnIGSAirfUH4q+UUlVVSSl3y8xSyrqulVLM7EdRBMBaGwRBlmXDMGzbRkRN0/R9b4wB4IdhuF8Zx1EIkef5uq5lWXZd17bt3jogANM0CSGKojDG/AkAXpIkzr9xHC/Lci5e5DTP85k4InCqjr3Y5BBv+wKS1ktiToMqaQAAAABJRU5ErkJggg==) !important;border-radius:20px;height:18px;width:18px;margin:0;}
+.titlebar-closebutton {background-repeat:no-repeat !important;background-position:center !important;background-size:cover !important;background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAIAAADZF8uwAAAAAXNSR0IArs4c6QAAARlJREFUKBVtjq+ugzAUxsswiDnwM6Sd6wPwAggy0xfAwXATNbxCQzDA7OxEE5KZmYU3IKmDmVoSzMRmML2X22R3CfvEyfnzO985hu/7h8MBQggWut/veZ6P42iWZfmVAADYtu26btM0KwihUiqKIiHE20sIEccxAGC73e52uxUAwDCMJEkYY5oTQjDG9vu93gmCwJBS6kLPCCGcc0opxlj3lVKzkxbGmBByOp0IIW9Cj/4hIQTnPAxDzvnnfzMn/1TXted5dV1LKT9zKWXbtrOTUqqqqvcfGGNK6fF41Lcul4txvV4RQrpexq7r0jQ1h2FACDmOsyT6vs+y7PV6mev1+na7TdO02Wwsy9Lo4/E4n89FUTyfz9/ODy3FicmPjU5zAAAAAElFTkSuQmCC) !important;border-radius:20px;height:18px;width:18px;margin:0;}
+
 `);
    
   
@@ -147,16 +166,20 @@ function ReactStandardWindow(params){
   var $id=this.id="wnd_"+(w96.WindowSystem._WinId);
   w96.WindowSystem.windows.push(this);
   w96.WindowSystem._WinId++;
-  if(params.center) {
-    params.initialX=(window.innerWidth-params.initialWidth)/2;
-    params.initialY=(window.innerHeight-params.initialHeight)/2;
+  if(args.center) {
+    args.initialX=(window.innerWidth-params.initialWidth)/2;
+    args.initialY=(window.innerHeight-params.initialHeight)/2;
   }
-  if(!params.initialX) {
-    params.initialX=Math.floor(Math.random()*(window.innerWidth-params.initialWidth))
+  if(!args.initialX) {
+    args.initialX=Math.floor(Math.random()*(window.innerWidth-params.initialWidth))
   }
-  if(!params.initialY) {
-    params.initialY=Math.floor(Math.random()*(window.innerHeight-params.initialHeight))
+  if(!args.initialY) {
+    args.initialY=Math.floor(Math.random()*(window.innerHeight-params.initialHeight))
   }
+  /*args.initialX=params.initialX;
+  args.initialY=params.initialY;
+  args.initialHeight=params.initialHeight;
+  args.initialWidth=params.initialWidth;*/
   this.params=args;
   this.shown=false;
   this.title=args.title;
@@ -199,7 +222,7 @@ ReactStandardWindow.prototype.toggleMinimize=function () {
 $Desktop.onclick=function(){w96.WindowSystem.deactivateAllWindows();};
 ReactStandardWindow.prototype.registerWindow=function(){
   var w$=document.createElement('div');
-  w$.window=this
+  w$.window=this;
   //var us=this;
   w$.onmousedown=function(e){e.cancelBubble=true;try{e.stopPropagation()}catch(x){null};this.window.active()}
   w$.onclick=function(e){e.cancelBubble=true;try{e.stopPropagation()}catch(x){null};}
