@@ -136,8 +136,10 @@ function ReactStandardWindow(params){
     resizable: true,
     maximizable: true,
     minimizable: true,
-    windowClass:params.windowClass||""
+    windowClass:params.windowClass||"",
+    controlBoxStyle:params.controlBoxStyle||"WS_CBX_MINMAXCLOSE",
   };
+  this.maximizeInfo={y:'0px',x:'0px',w:'0px',h:'0px'};
   var $id=this.id="wnd_"+(w96.WindowSystem._WinId);
   w96.WindowSystem.windows.push(this);
   w96.WindowSystem._WinId++;
@@ -241,6 +243,7 @@ ReactStandardWindow.prototype.registerWindow=function(){
     handles:'all'
   });
   this.wndObject=w$;
+  setInterval(function(){if(me.maximzied){w$.style.height=(window.innerHeight-$Taskbar.offsetHeight)+"px"}},100);
   this.setControlBoxStyle(this.params.controlBoxStyle);
 }
   
@@ -254,12 +257,12 @@ ReactStandardWindow.prototype.setControlBoxStyle=function(cbx){
     this.wndObject.querySelector(".titlebar-minbutton").style.display="none";
     this.wndObject.querySelector(".titlebar-closebutton").style.display="";
   } else if(cbx=="WS_CBX_MINCLOSE") {
-    this.wndObject.querySelector(".titlebar-maxbutton").className="titlebar-maxbutton inactive-tb-button";
+    this.wndObject.querySelector(".titlebar-maxbutton").className="titlebar-maxbutton inactive-tb-button no-drag";
     this.wndObject.querySelector(".titlebar-minbutton").style.display="";
     this.wndObject.querySelector(".titlebar-closebutton").style.display="";
   } else {
     this.wndObject.querySelector(".titlebar-maxbutton").style.display="";
-    this.wndObject.querySelector(".titlebar-maxbutton").className="titlebar-maxbutton"
+    this.wndObject.querySelector(".titlebar-maxbutton").className="titlebar-maxbutton no-drag"
     this.wndObject.querySelector(".titlebar-minbutton").style.display="";
     this.wndObject.querySelector(".titlebar-closebutton").style.display="";
   }
@@ -348,6 +351,25 @@ ReactTaskbarShell.prototype.deactivateAppBar=function(id) {
   }catch(e){null}
 }
 
+  
+ReactStandardWindow.prototype.toggleMaximize=function(){
+  if(this.maximized){
+    this.wndObject.style.top=this.maximizeInfo.y;
+    this.wndObject.style.left=this.maximizeInfo.x;
+    this.wndObject.style.height=this.maximizeInfo.h;
+    this.wndObject.style.width=this.maximizeInfo.w;
+  } else {
+    this.maximizeInfo.y=this.wndObject.style.top;
+    this.maximizeInfo.x=this.wndObject.style.left;
+    this.maximizeInfo.w=this.wndObject.style.width;
+    this.maximizeInfo.h=this.wndObject.style.height;
+    this.wndObject.style.width="100%";
+    this.wndObject.style.top="0px";
+    this.wndObject.style.left="0px";
+  }
+  this.maximized=!this.maximized;
+}
+  
 react.shell.Taskbar=new ReactTaskbarShell();
 react.WindowSystem = new ReactWindowSystem();
 react.StandardWindow=ReactStandardWindow;
@@ -362,7 +384,7 @@ setTimeout(function () {
     <button class='rws-rkl'>remove kernel</button><br>
     <input class='rws-pti' value='W96FS'/><button class='rws-scp'>switch partition</button>
     </div>`,
-    taskbar: true
+    taskbar: true,
   });
   sw.show();
   var body=sw.wndObject;
