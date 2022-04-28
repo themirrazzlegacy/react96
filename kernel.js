@@ -237,13 +237,14 @@ ReactStandardWindow.prototype.registerWindow=function(){
   w$.appendChild(b$);
   $WindowContainer.appendChild(w$);
   $('#'+w$.id).draggable({
-    cancel:'.no-drag'
+    cancel:'.no-drag',
+    iframeFix:true
   });
   $('#'+w$.id).resizable({
     handles:'all'
   });
   this.wndObject=w$;
-  setInterval(function(){if(me.maximzied){w$.style.height=(window.innerHeight-$Taskbar.offsetHeight)+"px"}},100);
+  setInterval(function(){if(me.maximized){w$.style.height=(window.innerHeight-$Taskbar.offsetHeight)+"px"}},100);
   this.setControlBoxStyle(this.params.controlBoxStyle);
 }
   
@@ -353,11 +354,20 @@ ReactTaskbarShell.prototype.deactivateAppBar=function(id) {
 
   
 ReactStandardWindow.prototype.toggleMaximize=function(){
+  var w$=this.wndObject
   if(this.maximized){
     this.wndObject.style.top=this.maximizeInfo.y;
     this.wndObject.style.left=this.maximizeInfo.x;
     this.wndObject.style.height=this.maximizeInfo.h;
     this.wndObject.style.width=this.maximizeInfo.w;
+    $('#'+w$.id).draggable({
+    cancel:'.no-drag',
+      iframeFix:true,
+      disabled:false
+  });
+  $('#'+w$.id).resizable({
+    handles:'all'
+  });
   } else {
     this.maximizeInfo.y=this.wndObject.style.top;
     this.maximizeInfo.x=this.wndObject.style.left;
@@ -366,6 +376,10 @@ ReactStandardWindow.prototype.toggleMaximize=function(){
     this.wndObject.style.width="100%";
     this.wndObject.style.top="0px";
     this.wndObject.style.left="0px";
+    $('#'+w$.id).draggable('option','disabled',true);
+  $('#'+w$.id).resizable({
+    handles:'none'
+  });
   }
   this.maximized=!this.maximized;
 }
