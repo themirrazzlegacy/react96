@@ -1,3 +1,4 @@
+> :warning: this repository is no longer actively maintained. use it at your own risk!
 # React96
 A custom kernel for Windows96
 
